@@ -11,7 +11,13 @@ options.addArguments(
 );
 
 describe('Untitled', function() {
-  this.timeout(30000);
+  this.timeout(15000); // Set timeout to 15 seconds
+
+  before(function(done) {
+    // Wait for 5 seconds before starting the tests
+    setTimeout(done, 5000);
+  });
+
   let driver;
   let vars;
   beforeEach(async function() {
