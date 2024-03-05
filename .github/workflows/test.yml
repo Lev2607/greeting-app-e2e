@@ -18,15 +18,29 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Start Selenium Server
-      uses: browser-actions/setup-selenium@latest
-      with:
-        selenium-version: 3.141.59
+    - name: Install Selenium and Chrome WebDriver
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
+        sudo apt-get install default-jdk # install Java
 
-    - name: Start Chrome Browser
-      uses: browser-actions/setup-chrome@latest
-      with:
-        chrome-version: latest
+        # Install Chrome.
+        sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get -y update
+        sudo apt-get -y install google-chrome-stable
+
+        # Install ChromeDriver.
+        wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip
+        unzip chromedriver_linux64.zip
+
+        # Make it executable.
+        chmod +x chromedriver
+
+        # Move the ChromeDriver to /usr/local/bin.
+        sudo mv -f chromedriver /usr/local/share/chromedriver
+        sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
+        sudo ln -s /usr/local/share/chromedriver /usr/bin/chromedriver
 
     - name: Start server
       run: |
