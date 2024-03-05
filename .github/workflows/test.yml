@@ -1,55 +1,36 @@
-name: Selenium Test
+name: Run Selenium Tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  test:
+  build:
+
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    strategy:
+      matrix:
+        node-version: [14.x]
 
-    - name: Set up Node.js
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
-        node-version: 14
+        node-version: ${{ matrix.node-version }}
+
+    - name: update apt
+      run: sudo apt -y update 
+  
+    - name: Install chrome
+      run: sudo apt -y install google-chrome-stable
 
     - name: Install dependencies
       run: npm install
 
-    - name: Install Selenium and Chrome WebDriver
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y unzip xvfb libxi6 libgconf-2-4
-        sudo apt-get install default-jdk # install Java
-
-        # Install Chrome.
-        sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-        sudo apt-get update
-        sudo apt-get install -y google-chrome-stable
-
-        # Get Chrome version.
-        CHROME_VERSION=$(google-chrome-stable --version | awk '{ print $3 }' | cut -d'.' -f1)
-
-        # Install ChromeDriver.
-        DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
-        wget "https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip"
-        unzip chromedriver_linux64.zip
-
-        # Make it executable.
-        chmod +x chromedriver
-
-        # Move the ChromeDriver to /usr/local/bin.
-        sudo mv -f chromedriver /usr/local/share/chromedriver
-        sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
-        sudo ln -s -f /usr/local/share/chromedriver /usr/bin/chromedriver
-
-    - name: Start server
-      run: |
-        npm start &
-        sleep 5
-
-    - name: Run tests
-      run: npm test
+    - name: Start Web Server and run test
+      run: npm start & npm test
