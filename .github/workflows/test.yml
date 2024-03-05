@@ -31,7 +31,7 @@ jobs:
         sudo apt-get -y install google-chrome-stable
 
         # Get Chrome version.
-        CHROME_VERSION=$(google-chrome-stable --version | grep -oE "[0-9]+")
+        CHROME_VERSION=$(google-chrome-stable --version | awk '{ print $3 }' | cut -d'.' -f1)
 
         # Install ChromeDriver.
         DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
