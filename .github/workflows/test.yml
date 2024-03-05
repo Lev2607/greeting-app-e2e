@@ -26,9 +26,9 @@ jobs:
 
         # Install Chrome.
         sudo curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list.d/google-chrome.list
-        sudo apt-get -y update
-        sudo apt-get -y install google-chrome-stable
+        echo "deb [arch=amd64]  http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable=91.0.4472.101-1
 
         # Get Chrome version.
         CHROME_VERSION=$(google-chrome-stable --version | awk '{ print $3 }' | cut -d'.' -f1)
